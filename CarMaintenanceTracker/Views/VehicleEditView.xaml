@@ -10,11 +10,10 @@
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <converters:NotNullToBooleanConverter x:Key="NotNullToBooleanConverter" />
     </UserControl.Resources>
-    <StackPanel Margin="0,8,0,0"
-                IsEnabled="{Binding SelectedVehicle, Converter={StaticResource NotNullToBooleanConverter}}">
+    <StackPanel Margin="0,8,0,0">
         <TextBlock Text="Edit Vehicle" FontWeight="Bold" Margin="0,0,0,4" />
 
-        <Grid>
+        <Grid IsEnabled="{Binding SelectedVehicle, Converter={StaticResource NotNullToBooleanConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="80" />
                 <ColumnDefinition Width="*" />
@@ -52,7 +51,8 @@
             <Button Content="Add New" Command="{Binding AddVehicleCommand}" Margin="0,0,4,0" Padding="6,2" />
             <Button Content="Save" Command="{Binding SaveVehicleCommand}" Margin="0,0,4,0" Padding="6,2"
                     IsEnabled="{Binding SelectedVehicle.HasErrors, Converter={StaticResource InverseBooleanConverter}, FallbackValue=False}" />
-            <Button Content="Delete" Click="DeleteButton_Click" Padding="6,2" />
+            <Button Content="Delete" Click="DeleteButton_Click" Padding="6,2"
+                    IsEnabled="{Binding SelectedVehicle, Converter={StaticResource NotNullToBooleanConverter}}" />
         </StackPanel>
     </StackPanel>
 </UserControl>
