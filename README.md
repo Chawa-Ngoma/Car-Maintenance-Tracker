@@ -18,6 +18,4 @@ persistence and a chart view of cost and mileage over time.
 
 Requires the .NET 8 SDK and Windows (WPF is Windows-only).
 
-## Status
-
-See `claude/CAR-TRACKER-PHASES.md` for the phased build plan and current progress.
+Currently in active development.
