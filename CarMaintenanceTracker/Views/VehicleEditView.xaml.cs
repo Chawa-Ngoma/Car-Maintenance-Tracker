@@ -7,7 +7,7 @@ namespace CarMaintenanceTracker.Views;
 /// <summary>
 /// Interaction logic for VehicleEditView.xaml. DataContext is inherited from the
 /// parent (MainViewModel) — the only code-behind logic here is the delete
-/// confirmation, which has to live in code-behind because MessageBox is a UI concern.
+/// confirmation, which has to live in code-behind because showing a dialog is a UI concern.
 /// </summary>
 public partial class VehicleEditView : UserControl
 {
@@ -23,13 +23,13 @@ public partial class VehicleEditView : UserControl
             return;
         }
 
-        var result = MessageBox.Show(
+        var owner = Window.GetWindow(this);
+        var confirmed = ConfirmationDialog.Show(
+            owner,
             $"Delete '{viewModel.SelectedVehicle.Nickname}' and all of its service entries?",
-            "Confirm Delete",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning);
+            confirmLabel: "Delete");
 
-        if (result == MessageBoxResult.Yes)
+        if (confirmed)
         {
             viewModel.DeleteVehicleCommand.Execute(null);
         }
