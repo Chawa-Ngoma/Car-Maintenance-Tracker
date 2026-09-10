@@ -88,6 +88,7 @@
         </DataTemplate>
     </Window.Resources>
 
+    <Grid>
     <Grid Margin="16">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -175,5 +176,8 @@
                 </ScrollViewer>
             </DockPanel>
         </Border>
+    </Grid>
+
+        <views:ToastHost />
     </Grid>
 </Window>

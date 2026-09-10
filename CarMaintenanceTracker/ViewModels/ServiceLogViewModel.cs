@@ -105,8 +105,15 @@ public class ServiceLogViewModel : ObservableObject
             return;
         }
 
+        if (SelectedEntry.HasErrors)
+        {
+            ToastService.ShowError("Couldn't save — check the highlighted fields");
+            return;
+        }
+
         await _repository.UpdateServiceEntryAsync(SelectedEntry);
         RaiseSummaryPropertiesChanged(); // editing Cost/Date in place doesn't raise CollectionChanged
+        ToastService.ShowSuccess("Service entry saved");
     }
 
     private async Task DeleteSelectedEntryAsync()

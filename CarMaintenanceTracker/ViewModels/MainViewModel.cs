@@ -80,7 +80,14 @@ public class MainViewModel : ObservableObject
             return;
         }
 
+        if (SelectedVehicle.HasErrors)
+        {
+            ToastService.ShowError("Couldn't save — check the highlighted fields");
+            return;
+        }
+
         await _repository.UpdateVehicleAsync(SelectedVehicle);
+        ToastService.ShowSuccess("Vehicle saved");
     }
 
     private async Task DeleteSelectedVehicleAsync()
