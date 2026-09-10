@@ -132,7 +132,7 @@ public class ServiceLogViewModel : ObservableObject
 
         if (SelectedEntry.HasErrors)
         {
-            ToastService.ShowError("Couldn't save — check the highlighted fields");
+            ToastService.ShowValidationError();
             return;
         }
 

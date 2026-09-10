@@ -7,7 +7,6 @@ namespace CarMaintenanceTracker.Services;
 public interface IServiceLogRepository
 {
     Task<List<Vehicle>> GetVehiclesAsync();
-    Task<Vehicle?> GetVehicleAsync(int vehicleId);
     Task<Vehicle> AddVehicleAsync(Vehicle vehicle);
     Task UpdateVehicleAsync(Vehicle vehicle);
     Task DeleteVehicleAsync(int vehicleId);

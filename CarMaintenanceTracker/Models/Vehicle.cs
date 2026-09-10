@@ -32,10 +32,7 @@ public class Vehicle : ValidatableModel
     public int Year
     {
         get => _year;
-        set => SetField(ref _year, value,
-            value < MinimumYear || value > DateTime.Now.Year + 1
-                ? $"Year must be between {MinimumYear} and {DateTime.Now.Year + 1}."
-                : null);
+        set => SetField(ref _year, value, ValidateYear(value));
     }
 
     public string Nickname
@@ -51,4 +48,12 @@ public class Vehicle : ValidatableModel
     }
 
     public List<ServiceEntry> ServiceEntries { get; set; } = new();
+
+    private static string? ValidateYear(int year)
+    {
+        var maximumYear = DateTime.Now.Year + 1;
+        return year < MinimumYear || year > maximumYear
+            ? $"Year must be between {MinimumYear} and {maximumYear}."
+            : null;
+    }
 }

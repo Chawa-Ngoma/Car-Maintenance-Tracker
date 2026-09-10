@@ -82,7 +82,7 @@ public class MainViewModel : ObservableObject
 
         if (SelectedVehicle.HasErrors)
         {
-            ToastService.ShowError("Couldn't save — check the highlighted fields");
+            ToastService.ShowValidationError();
             return;
         }
 

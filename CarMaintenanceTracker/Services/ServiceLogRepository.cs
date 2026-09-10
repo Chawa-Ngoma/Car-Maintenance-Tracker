@@ -26,15 +26,6 @@ public class ServiceLogRepository : IServiceLogRepository
         return await context.Vehicles.AsNoTracking().ToListAsync();
     }
 
-    public async Task<Vehicle?> GetVehicleAsync(int vehicleId)
-    {
-        await using var context = new AppDbContext(_options);
-        return await context.Vehicles
-            .Include(v => v.ServiceEntries)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(v => v.Id == vehicleId);
-    }
-
     public async Task<Vehicle> AddVehicleAsync(Vehicle vehicle)
     {
         await using var context = new AppDbContext(_options);

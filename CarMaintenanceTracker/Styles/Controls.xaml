@@ -106,15 +106,14 @@
         </Setter>
     </Style>
 
-    <!-- Inputs: 4px corner radius, BorderBrush border, AccentBrush focus outline -->
-
-    <Style TargetType="TextBox">
-        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
-        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
-        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="6,4" />
+    <!--
+        Shared by every validated input (TextBox, DatePicker): blanks WPF's
+        default red-squiggle error adorner and shows the error as a themed
+        ToolTip instead (see the ToolTip style above). TargetType="Control" so
+        both styles below can share it via BasedOn despite targeting different
+        concrete controls — this used to be duplicated verbatim in both styles.
+    -->
+    <Style x:Key="ValidationTooltipBaseStyle" TargetType="Control">
         <Setter Property="Validation.ErrorTemplate">
             <Setter.Value>
                 <ControlTemplate>
@@ -122,6 +121,22 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <Trigger Property="Validation.HasError" Value="True">
+                <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Inputs: 4px corner radius, BorderBrush border, AccentBrush focus outline -->
+
+    <Style TargetType="TextBox" BasedOn="{StaticResource ValidationTooltipBaseStyle}">
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="6,4" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
@@ -147,11 +162,6 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Style.Triggers>
-            <Trigger Property="Validation.HasError" Value="True">
-                <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}" />
-            </Trigger>
-        </Style.Triggers>
     </Style>
 
     <!--
@@ -166,19 +176,12 @@
         The popup still opens/functions correctly; only its color scheme is
         untouched default WPF blue.
     -->
-    <Style TargetType="DatePicker">
+    <Style TargetType="DatePicker" BasedOn="{StaticResource ValidationTooltipBaseStyle}">
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="6,4" />
-        <Setter Property="Validation.ErrorTemplate">
-            <Setter.Value>
-                <ControlTemplate>
-                    <AdornedElementPlaceholder />
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="DatePicker">
@@ -232,11 +235,6 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Style.Triggers>
-            <Trigger Property="Validation.HasError" Value="True">
-                <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}" />
-            </Trigger>
-        </Style.Triggers>
     </Style>
 
     <!-- Card-row list: flat ListBox chrome, rows get a rounded selection/hover highlight -->

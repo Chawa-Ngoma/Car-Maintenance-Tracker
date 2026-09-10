@@ -11,9 +11,15 @@ public record ToastMessage(string Text, ToastType Type);
 /// </summary>
 public static class ToastService
 {
+    // Shared across every "Save" command's HasErrors guard (MainViewModel,
+    // ServiceLogViewModel) -- was a literal duplicated in both places.
+    private const string ValidationErrorMessage = "Couldn't save — check the highlighted fields";
+
     public static event EventHandler<ToastMessage>? Toast;
 
     public static void ShowSuccess(string message) => Toast?.Invoke(null, new ToastMessage(message, ToastType.Success));
 
     public static void ShowError(string message) => Toast?.Invoke(null, new ToastMessage(message, ToastType.Error));
+
+    public static void ShowValidationError() => ShowError(ValidationErrorMessage);
 }
