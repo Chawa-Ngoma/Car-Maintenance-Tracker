@@ -58,7 +58,21 @@ public static class NumericInputBehavior
     private static void OnPreviewTextInput(object sender, TextCompositionEventArgs e)
     {
         var textBox = (TextBox)sender;
-        e.Handled = !IsValid(textBox, GetProposedText(textBox, e.Text));
+        var insertedText = NormalizeDecimalSeparator(textBox, e.Text);
+
+        if (!IsValid(textBox, GetProposedText(textBox, insertedText)))
+        {
+            e.Handled = true;
+            return;
+        }
+
+        // Only take over the insertion ourselves when we actually rewrote the
+        // character (comma -> period); otherwise let WPF insert e.Text normally.
+        if (insertedText != e.Text)
+        {
+            InsertText(textBox, insertedText);
+            e.Handled = true;
+        }
     }
 
     private static void OnPaste(object sender, DataObjectPastingEventArgs e)
@@ -66,11 +80,42 @@ public static class NumericInputBehavior
         var textBox = (TextBox)sender;
 
         if (!e.DataObject.GetDataPresent(DataFormats.Text) ||
-            e.DataObject.GetData(DataFormats.Text) is not string pastedText ||
-            !IsValid(textBox, GetProposedText(textBox, pastedText)))
+            e.DataObject.GetData(DataFormats.Text) is not string pastedText)
         {
             e.CancelCommand();
+            return;
         }
+
+        var normalizedText = NormalizeDecimalSeparator(textBox, pastedText);
+
+        if (!IsValid(textBox, GetProposedText(textBox, normalizedText)))
+        {
+            e.CancelCommand();
+            return;
+        }
+
+        if (normalizedText != pastedText)
+        {
+            InsertText(textBox, normalizedText);
+            e.CancelCommand(); // we already performed the (normalized) insertion ourselves
+        }
+    }
+
+    /// <summary>
+    /// South African number formatting conventionally uses "," as the decimal
+    /// separator (and Windows' numpad decimal key emits "," rather than "." on
+    /// this locale), so Decimal mode accepts either character but always stores
+    /// "." -- keeping the field's value locale-independent, consistent with
+    /// Converters/CurrencyToRandStringConverter's explicit-formatting approach.
+    /// </summary>
+    private static string NormalizeDecimalSeparator(DependencyObject textBox, string text) =>
+        GetMode(textBox) == NumericInputMode.Decimal ? text.Replace(',', '.') : text;
+
+    private static void InsertText(TextBox textBox, string text)
+    {
+        var start = textBox.SelectionStart;
+        textBox.Text = GetProposedText(textBox, text);
+        textBox.SelectionStart = start + text.Length;
     }
 
     private static string GetProposedText(TextBox textBox, string insertedText)
