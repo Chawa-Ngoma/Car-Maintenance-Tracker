@@ -18,13 +18,15 @@ public class Vehicle : ValidatableModel
     public string Make
     {
         get => _make;
-        set => SetField(ref _make, value, string.IsNullOrWhiteSpace(value) ? "Make is required." : null);
+        set => SetField(ref _make, value,
+            string.IsNullOrWhiteSpace(value) ? "Make is required." : ValidateNotPurelyNumeric(value, "Make"));
     }
 
     public string Model
     {
         get => _model;
-        set => SetField(ref _model, value, string.IsNullOrWhiteSpace(value) ? "Model is required." : null);
+        set => SetField(ref _model, value,
+            string.IsNullOrWhiteSpace(value) ? "Model is required." : ValidateNotPurelyNumeric(value, "Model"));
     }
 
     public int Year
@@ -39,7 +41,7 @@ public class Vehicle : ValidatableModel
     public string Nickname
     {
         get => _nickname;
-        set => SetField(ref _nickname, value, null);
+        set => SetField(ref _nickname, value, ValidateNotPurelyNumeric(value, "Nickname"));
     }
 
     public string Plate

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:converters="clr-namespace:CarMaintenanceTracker.Converters"
+             xmlns:behaviors="clr-namespace:CarMaintenanceTracker.Behaviors"
              mc:Ignorable="d"
              d:DesignHeight="220" d:DesignWidth="300">
     <UserControl.Resources>
@@ -40,6 +41,8 @@
 
             <TextBlock Grid.Row="3" Grid.Column="0" Text="Year" Style="{StaticResource FieldLabelTextStyle}" />
             <TextBox Grid.Row="3" Grid.Column="1" Margin="0,3"
+                     behaviors:NumericInputBehavior.Mode="Integer"
+                     behaviors:NumericInputBehavior.MaxLength="4"
                      Text="{Binding SelectedVehicle.Year, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
 
             <TextBlock Grid.Row="4" Grid.Column="0" Text="Plate" Style="{StaticResource FieldLabelTextStyle}" />

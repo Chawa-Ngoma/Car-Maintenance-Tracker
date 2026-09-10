@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace CarMaintenanceTracker.Models;
@@ -30,6 +31,17 @@ public abstract class ValidatableModel : INotifyPropertyChanged, INotifyDataErro
 
         return errors;
     }
+
+    /// <summary>
+    /// Shared rule for free-text fields that allow digits as part of the text
+    /// (e.g. "A4", "10,000 mile service") but shouldn't accept a value that's
+    /// nothing but digits. Returns null (no error) for an empty value -- that's
+    /// the required-field rule's job, not this one's.
+    /// </summary>
+    protected static string? ValidateNotPurelyNumeric(string value, string fieldName) =>
+        !string.IsNullOrEmpty(value) && value.All(char.IsDigit)
+            ? $"{fieldName} cannot be only numbers."
+            : null;
 
     protected void SetField<T>(ref T field, T value, string? error, [CallerMemberName] string? propertyName = null)
     {

@@ -29,7 +29,8 @@ public class ServiceEntry : ValidatableModel
     public string ServiceType
     {
         get => _serviceType;
-        set => SetField(ref _serviceType, value, string.IsNullOrWhiteSpace(value) ? "Service type is required." : null);
+        set => SetField(ref _serviceType, value,
+            string.IsNullOrWhiteSpace(value) ? "Service type is required." : ValidateNotPurelyNumeric(value, "Service type"));
     }
 
     public decimal Cost
