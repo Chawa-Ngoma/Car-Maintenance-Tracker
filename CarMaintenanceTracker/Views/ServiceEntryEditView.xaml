@@ -39,8 +39,24 @@
                      Text="{Binding SelectedEntry.ServiceType, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
 
             <TextBlock Grid.Row="3" Grid.Column="0" Text="Cost" Style="{StaticResource FieldLabelTextStyle}" />
-            <TextBox Grid.Row="3" Grid.Column="1" Margin="0,3"
-                     Text="{Binding SelectedEntry.Cost, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+            <Grid Grid.Row="3" Grid.Column="1" Margin="0,3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <!--
+                    A static "R" prefix rather than formatting the bound text as
+                    currency: this TextBox is two-way, edited keystroke-by-keystroke
+                    (UpdateSourceTrigger=PropertyChanged) directly against the decimal
+                    Cost property, so embedding "R" into the bound string itself would
+                    need a ConvertBack that reparses "R123.45" on every keystroke,
+                    including invalid in-progress states while typing/deleting.
+                -->
+                <TextBlock Grid.Column="0" Text="R" Style="{StaticResource FieldLabelTextStyle}"
+                           Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,4,0" />
+                <TextBox Grid.Column="1"
+                         Text="{Binding SelectedEntry.Cost, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+            </Grid>
 
             <TextBlock Grid.Row="4" Grid.Column="0" Text="Notes" Style="{StaticResource FieldLabelTextStyle}" />
             <TextBox Grid.Row="4" Grid.Column="1" Margin="0,3"

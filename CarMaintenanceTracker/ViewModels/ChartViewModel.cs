@@ -18,6 +18,10 @@ public class ChartViewModel : ObservableObject
 {
     private const int MinimumPointsForTrend = 2;
 
+    // Explicit, not CurrentCulture-dependent: the app is Rand-only (see
+    // Converters/CurrencyToRandStringConverter, used by every other cost display).
+    private static readonly CultureInfo RandCulture = CultureInfo.GetCultureInfo("en-ZA");
+
     // Must match Styles/Colors.xaml's AccentBrush (#C8372E) per DESIGN-SPEC.md.
     // OxyPlot series colors are plain OxyColor values set in code, not WPF
     // resources, so this is a deliberate, documented duplication rather than a
@@ -78,11 +82,8 @@ public class ChartViewModel : ObservableObject
         model.Axes.Add(new LinearAxis
         {
             Position = AxisPosition.Left,
-            // WPF's binding StringFormat=C (used by the Total Spent card) resolves
-            // against en-US regardless of OS locale, but OxyPlot's own StringFormat
-            // uses CurrentCulture -- explicit LabelFormatter keeps the two consistent
-            // instead of the axis showing "R" (Rand) while the summary card shows "$".
-            LabelFormatter = value => value.ToString("C0", CultureInfo.GetCultureInfo("en-US")),
+            // Explicit Rand formatting, matching every other cost display in the app.
+            LabelFormatter = value => value.ToString("C0", RandCulture),
             TextColor = TextColor,
             AxislineColor = GridlineColor,
             TicklineColor = GridlineColor,

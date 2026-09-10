@@ -12,6 +12,7 @@
         FontFamily="{StaticResource AppFontFamily}">
     <Window.Resources>
         <converters:ServiceTypeToIconConverter x:Key="ServiceTypeToIconConverter" />
+        <converters:CurrencyToRandStringConverter x:Key="CurrencyToRandStringConverter" />
 
         <!-- Vehicle card row: car icon badge + nickname + make/model/year subtitle -->
         <DataTemplate x:Key="VehicleCardTemplate">
@@ -67,14 +68,14 @@
                     <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="{Binding ServiceType, Mode=OneWay}" Style="{StaticResource CardTitleTextStyle}" />
                         <TextBlock Style="{StaticResource SubtitleTextStyle}">
-                            <Run Text="{Binding Date, Mode=OneWay, StringFormat=d}" />
+                            <Run Text="{Binding Date, Mode=OneWay, StringFormat='dd MMM yyyy'}" />
                             <Run Text="&#8226;" />
                             <Run Text="{Binding Odometer, Mode=OneWay, StringFormat=N0}" />
                             <Run Text="mi" />
                         </TextBlock>
                     </StackPanel>
 
-                    <TextBlock Grid.Column="2" Text="{Binding Cost, Mode=OneWay, StringFormat=C}"
+                    <TextBlock Grid.Column="2" Text="{Binding Cost, Mode=OneWay, Converter={StaticResource CurrencyToRandStringConverter}}"
                                Style="{StaticResource CardTitleTextStyle}" VerticalAlignment="Center" Margin="8,0" />
 
                     <Button Grid.Column="3" Content="&#9998;" Click="EditEntryButton_Click" Tag="{Binding}"
@@ -109,50 +110,69 @@
             </DockPanel>
         </Border>
 
-        <!-- Service log for the selected vehicle -->
+        <!--
+            Service log for the selected vehicle.
+            Root cause of a prior regression: DockPanel carves space from its
+            *remaining* rectangle in child declaration order. Header, the summary
+            UniformGrid, and the fixed-height (200px) chart card were all Top-docked
+            and declared before the Bottom-docked ServiceEntryEditView, so they ate
+            most of this card's fixed vertical budget (the Window has a fixed
+            Height, no SizeToContent) before ServiceEntryEditView was ever arranged.
+            By the time its turn came, the remaining rectangle was smaller than its
+            desired height, so its last row — the Add New/Save/Delete buttons —
+            was arranged into clipped, invisible space even though it was still in
+            the tree. Fixed by moving the variable-height content into a
+            ScrollViewer instead of relying on exact fixed-pixel arithmetic to
+            always add up: nothing can be silently clipped again, worst case the
+            panel scrolls.
+        -->
         <Border x:Name="ServiceLogPanel" Grid.Column="2" Style="{StaticResource PanelCardStyle}">
             <DockPanel>
                 <TextBlock DockPanel.Dock="Top" Text="Service Log" Style="{StaticResource SectionHeaderTextStyle}" />
 
-                <!-- Summary: Total spent / Entry count / Last service date -->
-                <UniformGrid DockPanel.Dock="Top" Columns="3" Margin="0,12,0,0">
-                    <Border Style="{StaticResource MetricCardStyle}" Margin="0,0,4,0">
-                        <StackPanel>
-                            <TextBlock Text="Total Spent" Style="{StaticResource MetricLabelTextStyle}" />
-                            <TextBlock Text="{Binding TotalCost, StringFormat=C}" Style="{StaticResource MetricNumberTextStyle}" />
-                        </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource MetricCardStyle}" Margin="4,0">
-                        <StackPanel>
-                            <TextBlock Text="Entries" Style="{StaticResource MetricLabelTextStyle}" />
-                            <TextBlock Text="{Binding EntryCount}" Style="{StaticResource MetricNumberTextStyle}" />
-                        </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource MetricCardStyle}" Margin="4,0,0,0">
-                        <StackPanel>
-                            <TextBlock Text="Last Service" Style="{StaticResource MetricLabelTextStyle}" />
-                            <TextBlock Text="{Binding LastServiceDate, StringFormat=d, TargetNullValue='—'}" Style="{StaticResource MetricNumberTextStyle}" />
-                        </StackPanel>
-                    </Border>
-                </UniformGrid>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                        <!-- Summary: Total spent / Entry count / Last service date -->
+                        <UniformGrid Columns="3" Margin="0,12,0,0">
+                            <Border Style="{StaticResource MetricCardStyle}" Margin="0,0,4,0">
+                                <StackPanel>
+                                    <TextBlock Text="Total Spent" Style="{StaticResource MetricLabelTextStyle}" />
+                                    <TextBlock Text="{Binding TotalCost, Converter={StaticResource CurrencyToRandStringConverter}}" Style="{StaticResource MetricNumberTextStyle}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource MetricCardStyle}" Margin="4,0">
+                                <StackPanel>
+                                    <TextBlock Text="Entries" Style="{StaticResource MetricLabelTextStyle}" />
+                                    <TextBlock Text="{Binding EntryCount}" Style="{StaticResource MetricNumberTextStyle}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource MetricCardStyle}" Margin="4,0,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="Last Service" Style="{StaticResource MetricLabelTextStyle}" />
+                                    <TextBlock Text="{Binding LastServiceDate, StringFormat='dd MMM yyyy', TargetNullValue='—'}" Style="{StaticResource MetricNumberTextStyle}" />
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
 
-                <!-- Cost trend for the selected vehicle -->
-                <Border x:Name="ChartPanel" DockPanel.Dock="Top" Style="{StaticResource MetricCardStyle}" Margin="0,12,0,0" Height="200">
-                    <DockPanel>
-                        <TextBlock DockPanel.Dock="Top" Text="Cost Trend" Style="{StaticResource CardTitleTextStyle}" Margin="0,0,0,4" />
-                        <views:ChartView />
-                    </DockPanel>
-                </Border>
+                        <!-- Cost trend for the selected vehicle -->
+                        <Border x:Name="ChartPanel" Style="{StaticResource MetricCardStyle}" Margin="0,12,0,0" Height="200">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Top" Text="Cost Trend" Style="{StaticResource CardTitleTextStyle}" Margin="0,0,0,4" />
+                                <views:ChartView />
+                            </DockPanel>
+                        </Border>
 
-                <views:ServiceEntryEditView DockPanel.Dock="Bottom" />
+                        <views:ServiceEntryEditView />
 
-                <ListBox DockPanel.Dock="Top"
-                         Style="{StaticResource CardRowListBoxStyle}"
-                         ItemContainerStyle="{StaticResource CardRowListBoxItemStyle}"
-                         ItemTemplate="{StaticResource ServiceEntryCardTemplate}"
-                         ItemsSource="{Binding ServiceEntries}"
-                         SelectedItem="{Binding SelectedEntry}"
-                         Margin="0,12,0,0" />
+                        <ListBox Style="{StaticResource CardRowListBoxStyle}"
+                                 ItemContainerStyle="{StaticResource CardRowListBoxItemStyle}"
+                                 ItemTemplate="{StaticResource ServiceEntryCardTemplate}"
+                                 ItemsSource="{Binding ServiceEntries}"
+                                 SelectedItem="{Binding SelectedEntry}"
+                                 Height="220"
+                                 Margin="0,12,0,0" />
+                    </StackPanel>
+                </ScrollViewer>
             </DockPanel>
         </Border>
     </Grid>
