@@ -1,8 +1,12 @@
 # Car Maintenance Tracker
 
-A multi-vehicle service log tracker built with WPF (.NET 8) and MVVM. Track vehicles
-and their service history — oil changes, repairs, inspections — with SQLite-backed
-persistence and a chart view of cost and mileage over time.
+![Car Maintenance Tracker screenshot](docs/screenshot.png)
+
+A multi-vehicle service log tracker built with WPF (.NET 8) and MVVM. Track
+vehicles and their service history — oil changes, repairs, inspections — with
+SQLite-backed persistence, a cost-over-time chart per vehicle, and a custom
+card-based UI with themed confirmation dialogs and toast notifications
+(no default MessageBox popups or system dialog chrome).
 
 ## Getting started
 
