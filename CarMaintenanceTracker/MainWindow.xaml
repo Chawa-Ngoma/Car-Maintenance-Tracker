@@ -13,6 +13,7 @@
     <Window.Resources>
         <converters:ServiceTypeToIconConverter x:Key="ServiceTypeToIconConverter" />
         <converters:CurrencyToRandStringConverter x:Key="CurrencyToRandStringConverter" />
+        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
 
         <!-- Vehicle card row: car icon badge + nickname + make/model/year subtitle -->
         <DataTemplate x:Key="VehicleCardTemplate">
@@ -101,13 +102,21 @@
             <DockPanel>
                 <TextBlock DockPanel.Dock="Top" Text="Vehicles" Style="{StaticResource SectionHeaderTextStyle}" />
                 <views:VehicleEditView DockPanel.Dock="Bottom" />
-                <ListBox DockPanel.Dock="Top"
-                         Style="{StaticResource CardRowListBoxStyle}"
-                         ItemContainerStyle="{StaticResource CardRowListBoxItemStyle}"
-                         ItemTemplate="{StaticResource VehicleCardTemplate}"
-                         ItemsSource="{Binding Vehicles}"
-                         SelectedItem="{Binding SelectedVehicle}"
-                         Margin="0,8,0,0" />
+                <Grid Margin="0,8,0,0">
+                    <ListBox Style="{StaticResource CardRowListBoxStyle}"
+                             ItemContainerStyle="{StaticResource CardRowListBoxItemStyle}"
+                             ItemTemplate="{StaticResource VehicleCardTemplate}"
+                             ItemsSource="{Binding Vehicles}"
+                             SelectedItem="{Binding SelectedVehicle}" />
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,32,0,0"
+                                Visibility="{Binding Vehicles.Count, Converter={StaticResource CountToVisibilityConverter}}">
+                        <TextBlock Text="&#128663;" FontSize="28" HorizontalAlignment="Center"
+                                   Foreground="{StaticResource SecondaryBrush}" Margin="0,0,0,8" />
+                        <TextBlock Text="No vehicles yet" Style="{StaticResource CardTitleTextStyle}" HorizontalAlignment="Center" />
+                        <TextBlock Text="Click Add New below to add your first vehicle." Style="{StaticResource SubtitleTextStyle}"
+                                   HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="200" Margin="0,4,0,0" />
+                    </StackPanel>
+                </Grid>
             </DockPanel>
         </Border>
 
@@ -165,13 +174,26 @@
 
                         <views:ServiceEntryEditView />
 
-                        <ListBox Style="{StaticResource CardRowListBoxStyle}"
-                                 ItemContainerStyle="{StaticResource CardRowListBoxItemStyle}"
-                                 ItemTemplate="{StaticResource ServiceEntryCardTemplate}"
-                                 ItemsSource="{Binding ServiceEntries}"
-                                 SelectedItem="{Binding SelectedEntry}"
-                                 Height="220"
-                                 Margin="0,12,0,0" />
+                        <StackPanel Orientation="Horizontal" Margin="0,12,0,4">
+                            <TextBlock Text="Sort by:" Style="{StaticResource SubtitleTextStyle}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                            <Button Content="Date" Command="{Binding SortByDateCommand}" Style="{StaticResource SecondaryButtonStyle}" Padding="8,3" Margin="0,0,6,0" />
+                            <Button Content="Odometer" Command="{Binding SortByOdometerCommand}" Style="{StaticResource SecondaryButtonStyle}" Padding="8,3" />
+                        </StackPanel>
+
+                        <Grid Height="220">
+                            <ListBox Style="{StaticResource CardRowListBoxStyle}"
+                                     ItemContainerStyle="{StaticResource CardRowListBoxItemStyle}"
+                                     ItemTemplate="{StaticResource ServiceEntryCardTemplate}"
+                                     ItemsSource="{Binding ServiceEntriesView}"
+                                     SelectedItem="{Binding SelectedEntry}" />
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,24,0,0"
+                                        Visibility="{Binding EntryCount, Converter={StaticResource CountToVisibilityConverter}}">
+                                <TextBlock Text="&#128221;" FontSize="26" HorizontalAlignment="Center"
+                                           Foreground="{StaticResource SecondaryBrush}" Margin="0,0,0,8" />
+                                <TextBlock Text="{Binding EmptyStateMessage}" Style="{StaticResource SubtitleTextStyle}"
+                                           HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="220" />
+                            </StackPanel>
+                        </Grid>
                     </StackPanel>
                 </ScrollViewer>
             </DockPanel>

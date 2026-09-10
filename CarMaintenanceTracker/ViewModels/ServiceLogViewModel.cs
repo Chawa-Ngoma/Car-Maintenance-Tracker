@@ -1,7 +1,9 @@
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using System.Windows.Input;
 using CarMaintenanceTracker.Models;
 using CarMaintenanceTracker.Services;
@@ -22,6 +24,9 @@ public class ServiceLogViewModel : ObservableObject
 
     public ObservableCollection<ServiceEntry> ServiceEntries { get; } = new();
 
+    /// <summary>Sorted view over ServiceEntries -- the View binds to this instead of the raw collection.</summary>
+    public ICollectionView ServiceEntriesView { get; }
+
     public ServiceEntry? SelectedEntry
     {
         get => _selectedEntry;
@@ -31,6 +36,8 @@ public class ServiceLogViewModel : ObservableObject
     public ICommand AddEntryCommand { get; }
     public ICommand SaveEntryCommand { get; }
     public ICommand DeleteEntryCommand { get; }
+    public ICommand SortByDateCommand { get; }
+    public ICommand SortByOdometerCommand { get; }
 
     /// <summary>Sum of all entries' Cost, for the "Total spent" summary card.</summary>
     public decimal TotalCost => ServiceEntries.Sum(entry => entry.Cost);
@@ -41,15 +48,31 @@ public class ServiceLogViewModel : ObservableObject
     /// <summary>Most recent entry date, for the "Last service date" summary card.</summary>
     public DateTime? LastServiceDate => ServiceEntries.Count == 0 ? null : ServiceEntries.Max(entry => entry.Date);
 
+    /// <summary>Message shown in place of the list when there are no entries to display.</summary>
+    public string EmptyStateMessage => _selectedVehicle is null
+        ? "Select a vehicle to see its service history."
+        : "No service entries yet — click Add New below to log one.";
+
     public ServiceLogViewModel(IServiceLogRepository repository)
     {
         _repository = repository;
 
+        ServiceEntriesView = CollectionViewSource.GetDefaultView(ServiceEntries);
+        ServiceEntriesView.SortDescriptions.Add(new SortDescription(nameof(ServiceEntry.Date), ListSortDirection.Descending));
+
         AddEntryCommand = new RelayCommand(async () => await AddEntryAsync(), () => _selectedVehicle is not null);
         SaveEntryCommand = new RelayCommand(async () => await SaveSelectedEntryAsync(), () => SelectedEntry is not null);
         DeleteEntryCommand = new RelayCommand(async () => await DeleteSelectedEntryAsync(), () => SelectedEntry is not null);
+        SortByDateCommand = new RelayCommand(() => SetSort(nameof(ServiceEntry.Date), ListSortDirection.Descending));
+        SortByOdometerCommand = new RelayCommand(() => SetSort(nameof(ServiceEntry.Odometer), ListSortDirection.Descending));
 
         ServiceEntries.CollectionChanged += (_, _) => RaiseSummaryPropertiesChanged();
+    }
+
+    private void SetSort(string propertyName, ListSortDirection direction)
+    {
+        ServiceEntriesView.SortDescriptions.Clear();
+        ServiceEntriesView.SortDescriptions.Add(new SortDescription(propertyName, direction));
     }
 
     private void RaiseSummaryPropertiesChanged()
@@ -57,6 +80,7 @@ public class ServiceLogViewModel : ObservableObject
         OnPropertyChanged(nameof(TotalCost));
         OnPropertyChanged(nameof(EntryCount));
         OnPropertyChanged(nameof(LastServiceDate));
+        OnPropertyChanged(nameof(EmptyStateMessage));
     }
 
     public async Task SetSelectedVehicleAsync(Vehicle? vehicle)
@@ -64,6 +88,7 @@ public class ServiceLogViewModel : ObservableObject
         _selectedVehicle = vehicle;
         SelectedEntry = null;
         ServiceEntries.Clear();
+        OnPropertyChanged(nameof(EmptyStateMessage));
 
         if (vehicle is null)
         {
