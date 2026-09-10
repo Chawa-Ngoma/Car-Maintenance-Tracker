@@ -117,12 +117,77 @@
         </Setter>
     </Style>
 
+    <!--
+        DatePicker: the text-box portion is retemplated to match the other inputs
+        (4px radius, BorderBrush, AccentBrush focus outline). The calendar POPUP
+        itself is intentionally NOT retemplated here — its selected-date highlight
+        comes from Calendar/CalendarDayButton's built-in template, which hardcodes
+        theme brushes rather than exposing them as overridable resource keys.
+        Reskinning that correctly means replacing the full CalendarItem/
+        CalendarDayButton ControlTemplates (well over a hundred lines, many named
+        parts), which is a much bigger and riskier change than this pass calls for.
+        The popup still opens/functions correctly; only its color scheme is
+        untouched default WPF blue.
+    -->
     <Style TargetType="DatePicker">
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="4,2" />
+        <Setter Property="Padding" Value="6,4" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DatePicker">
+                    <Border x:Name="Border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <DatePickerTextBox x:Name="PART_TextBox"
+                                                Grid.Column="0"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Foreground="{TemplateBinding Foreground}"
+                                                Padding="{TemplateBinding Padding}" />
+
+                            <Button x:Name="PART_Button"
+                                    Grid.Column="1"
+                                    Focusable="False"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Padding="6,0,8,0"
+                                    Foreground="{StaticResource SecondaryBrush}"
+                                    Content="&#128197;" />
+
+                            <Popup x:Name="PART_Popup"
+                                   Grid.Column="0"
+                                   Grid.ColumnSpan="2"
+                                   StaysOpen="False"
+                                   Placement="Bottom"
+                                   AllowsTransparency="True" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                            <Setter TargetName="Border" Property="BorderThickness" Value="2" />
+                        </Trigger>
+                        <Trigger Property="Validation.HasError" Value="True">
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource DangerBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.6" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!-- Card-row list: flat ListBox chrome, rows get a rounded selection/hover highlight -->
@@ -163,18 +228,30 @@
 
     <Style x:Key="BaseButtonStyle" TargetType="Button">
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
-        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="Padding" Value="16,8" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
+                    <!--
+                        Root cause of the "looks like text, not a button" bug: this
+                        ContentPresenter never consumed the Button's Padding, so the
+                        Border below shrink-wrapped to the bare glyph bounds with zero
+                        breathing room — Background/BorderBrush WERE rendering, just
+                        as a box exactly the size of the text, which reads as colored
+                        text rather than a button. Margin="{TemplateBinding Padding}"
+                        is the fix.
+                    -->
                     <Border x:Name="Border"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="4">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          RecognizesAccessKey="True" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled" Value="False">
