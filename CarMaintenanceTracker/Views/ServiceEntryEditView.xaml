@@ -10,8 +10,8 @@
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <converters:NotNullToBooleanConverter x:Key="NotNullToBooleanConverter" />
     </UserControl.Resources>
-    <StackPanel Margin="0,8,0,0">
-        <TextBlock Text="Edit Service Entry" FontWeight="Bold" Margin="0,0,0,4" />
+    <StackPanel Margin="0,12,0,0">
+        <TextBlock Text="Edit Service Entry" Style="{StaticResource CardTitleTextStyle}" Margin="0,0,0,8" />
 
         <Grid IsEnabled="{Binding SelectedEntry, Converter={StaticResource NotNullToBooleanConverter}}">
             <Grid.ColumnDefinitions>
@@ -26,32 +26,35 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Date" VerticalAlignment="Center" />
-            <DatePicker Grid.Row="0" Grid.Column="1" Margin="0,2"
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Date" Style="{StaticResource FieldLabelTextStyle}" />
+            <DatePicker Grid.Row="0" Grid.Column="1" Margin="0,3"
                         SelectedDate="{Binding SelectedEntry.Date, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="Odometer" VerticalAlignment="Center" />
-            <TextBox Grid.Row="1" Grid.Column="1" Margin="0,2"
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Odometer" Style="{StaticResource FieldLabelTextStyle}" />
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="0,3"
                      Text="{Binding SelectedEntry.Odometer, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="Service Type" VerticalAlignment="Center" />
-            <TextBox Grid.Row="2" Grid.Column="1" Margin="0,2"
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Service Type" Style="{StaticResource FieldLabelTextStyle}" />
+            <TextBox Grid.Row="2" Grid.Column="1" Margin="0,3"
                      Text="{Binding SelectedEntry.ServiceType, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
 
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="Cost" VerticalAlignment="Center" />
-            <TextBox Grid.Row="3" Grid.Column="1" Margin="0,2"
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Cost" Style="{StaticResource FieldLabelTextStyle}" />
+            <TextBox Grid.Row="3" Grid.Column="1" Margin="0,3"
                      Text="{Binding SelectedEntry.Cost, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
 
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="Notes" VerticalAlignment="Center" />
-            <TextBox Grid.Row="4" Grid.Column="1" Margin="0,2"
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Notes" Style="{StaticResource FieldLabelTextStyle}" />
+            <TextBox Grid.Row="4" Grid.Column="1" Margin="0,3"
                      Text="{Binding SelectedEntry.Notes, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
 
-        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-            <Button Content="Add New" Command="{Binding AddEntryCommand}" Margin="0,0,4,0" Padding="6,2" />
-            <Button Content="Save" Command="{Binding SaveEntryCommand}" Margin="0,0,4,0" Padding="6,2"
+        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+            <Button Content="Add New" Command="{Binding AddEntryCommand}" Margin="0,0,8,0"
+                    Style="{StaticResource PrimaryButtonStyle}" />
+            <Button Content="Save" Command="{Binding SaveEntryCommand}" Margin="0,0,8,0"
+                    Style="{StaticResource PrimaryButtonStyle}"
                     IsEnabled="{Binding SelectedEntry.HasErrors, Converter={StaticResource InverseBooleanConverter}, FallbackValue=False}" />
-            <Button Content="Delete" Click="DeleteButton_Click" Padding="6,2"
+            <Button Content="Delete" Click="DeleteButton_Click"
+                    Style="{StaticResource DeleteButtonStyle}"
                     IsEnabled="{Binding SelectedEntry, Converter={StaticResource NotNullToBooleanConverter}}" />
         </StackPanel>
     </StackPanel>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using CarMaintenanceTracker.Models;
@@ -31,6 +32,15 @@ public class ServiceLogViewModel : ObservableObject
     public ICommand SaveEntryCommand { get; }
     public ICommand DeleteEntryCommand { get; }
 
+    /// <summary>Sum of all entries' Cost, for the "Total spent" summary card.</summary>
+    public decimal TotalCost => ServiceEntries.Sum(entry => entry.Cost);
+
+    /// <summary>Number of entries, for the "Entry count" summary card.</summary>
+    public int EntryCount => ServiceEntries.Count;
+
+    /// <summary>Most recent entry date, for the "Last service date" summary card.</summary>
+    public DateTime? LastServiceDate => ServiceEntries.Count == 0 ? null : ServiceEntries.Max(entry => entry.Date);
+
     public ServiceLogViewModel(IServiceLogRepository repository)
     {
         _repository = repository;
@@ -38,6 +48,15 @@ public class ServiceLogViewModel : ObservableObject
         AddEntryCommand = new RelayCommand(async () => await AddEntryAsync(), () => _selectedVehicle is not null);
         SaveEntryCommand = new RelayCommand(async () => await SaveSelectedEntryAsync(), () => SelectedEntry is not null);
         DeleteEntryCommand = new RelayCommand(async () => await DeleteSelectedEntryAsync(), () => SelectedEntry is not null);
+
+        ServiceEntries.CollectionChanged += (_, _) => RaiseSummaryPropertiesChanged();
+    }
+
+    private void RaiseSummaryPropertiesChanged()
+    {
+        OnPropertyChanged(nameof(TotalCost));
+        OnPropertyChanged(nameof(EntryCount));
+        OnPropertyChanged(nameof(LastServiceDate));
     }
 
     public async Task SetSelectedVehicleAsync(Vehicle? vehicle)
@@ -87,6 +106,7 @@ public class ServiceLogViewModel : ObservableObject
         }
 
         await _repository.UpdateServiceEntryAsync(SelectedEntry);
+        RaiseSummaryPropertiesChanged(); // editing Cost/Date in place doesn't raise CollectionChanged
     }
 
     private async Task DeleteSelectedEntryAsync()

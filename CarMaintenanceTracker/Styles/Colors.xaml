@@ -1,0 +1,25 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Palette per DESIGN-SPEC.md. Named brushes match the spec's token column exactly. -->
+    <SolidColorBrush x:Key="AccentBrush" Color="#C8372E" />
+    <SolidColorBrush x:Key="AccentDarkBrush" Color="#A32D26" />
+    <SolidColorBrush x:Key="SecondaryBrush" Color="#3B5166" />
+    <SolidColorBrush x:Key="SecondaryLightBrush" Color="#E8ECEF" />
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="PageBackgroundBrush" Color="#F4F3EF" />
+    <SolidColorBrush x:Key="BorderBrush" Color="#E0DED8" />
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#22262B" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#6B6F73" />
+    <SolidColorBrush x:Key="DangerBrush" Color="#B02A2A" />
+    <SolidColorBrush x:Key="SuccessBrush" Color="#3C7A4E" />
+
+    <!--
+        Not in the spec's token table: translucent tints derived from AccentBrush/DangerBrush,
+        needed to implement "a light accent tint, not the full solid red" for the selected
+        vehicle row, and a matching hover tint for the outline-style Delete button.
+    -->
+    <SolidColorBrush x:Key="AccentLightBrush" Color="#1FC8372E" />
+    <SolidColorBrush x:Key="DangerLightBrush" Color="#1FB02A2A" />
+
+</ResourceDictionary>

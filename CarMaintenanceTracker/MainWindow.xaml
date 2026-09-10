@@ -5,58 +5,147 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CarMaintenanceTracker"
         xmlns:views="clr-namespace:CarMaintenanceTracker.Views"
+        xmlns:converters="clr-namespace:CarMaintenanceTracker.Converters"
         mc:Ignorable="d"
-        Title="Car Maintenance Tracker" Height="550" Width="950">
-    <Grid Margin="10">
+        Title="Car Maintenance Tracker" Height="620" Width="1000"
+        Background="{StaticResource PageBackgroundBrush}"
+        FontFamily="{StaticResource AppFontFamily}">
+    <Window.Resources>
+        <converters:ServiceTypeToIconConverter x:Key="ServiceTypeToIconConverter" />
+
+        <!-- Vehicle card row: car icon badge + nickname + make/model/year subtitle -->
+        <DataTemplate x:Key="VehicleCardTemplate">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border x:Name="IconBadge" Style="{StaticResource IconBadgeStyle}" VerticalAlignment="Center">
+                        <TextBlock x:Name="IconGlyph" Text="&#128663;" Style="{StaticResource IconGlyphTextStyle}" />
+                    </Border>
+
+                    <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock x:Name="NicknameText" Text="{Binding Nickname}" Style="{StaticResource CardTitleTextStyle}" />
+                        <TextBlock Style="{StaticResource SubtitleTextStyle}">
+                            <Run Text="{Binding Make, Mode=OneWay}" />
+                            <Run Text="{Binding Model, Mode=OneWay}" />
+                            <Run Text="(" /><Run Text="{Binding Year, Mode=OneWay}" /><Run Text=")" />
+                        </TextBlock>
+                    </StackPanel>
+                </Grid>
+
+                <Border Style="{StaticResource RowDividerStyle}" />
+            </StackPanel>
+
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
+                    <Setter TargetName="IconBadge" Property="Background" Value="{StaticResource AccentBrush}" />
+                    <Setter TargetName="IconGlyph" Property="Foreground" Value="White" />
+                    <Setter TargetName="NicknameText" Property="Foreground" Value="{StaticResource AccentBrush}" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <!-- Service log card row: service-type icon badge + type/date-odometer + cost -->
+        <DataTemplate x:Key="ServiceEntryCardTemplate">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Style="{StaticResource IconBadgeStyle}" VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource IconGlyphTextStyle}"
+                                   Text="{Binding ServiceType, Converter={StaticResource ServiceTypeToIconConverter}}" />
+                    </Border>
+
+                    <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding ServiceType, Mode=OneWay}" Style="{StaticResource CardTitleTextStyle}" />
+                        <TextBlock Style="{StaticResource SubtitleTextStyle}">
+                            <Run Text="{Binding Date, Mode=OneWay, StringFormat=d}" />
+                            <Run Text="&#8226;" />
+                            <Run Text="{Binding Odometer, Mode=OneWay, StringFormat=N0}" />
+                            <Run Text="mi" />
+                        </TextBlock>
+                    </StackPanel>
+
+                    <TextBlock Grid.Column="2" Text="{Binding Cost, Mode=OneWay, StringFormat=C}"
+                               Style="{StaticResource CardTitleTextStyle}" VerticalAlignment="Center" Margin="8,0" />
+
+                    <Button Grid.Column="3" Content="&#9998;" Click="EditEntryButton_Click" Tag="{Binding}"
+                            Style="{StaticResource SecondaryButtonStyle}" Padding="6,4" VerticalAlignment="Center"
+                            ToolTip="Edit this entry" />
+                </Grid>
+
+                <Border Style="{StaticResource RowDividerStyle}" />
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid Margin="16">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="16" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="1.2*" />
         </Grid.ColumnDefinitions>
 
         <!-- Vehicles -->
-        <DockPanel Grid.Column="0">
-            <TextBlock DockPanel.Dock="Top" Text="Vehicles" FontWeight="Bold" FontSize="14" />
-            <views:VehicleEditView DockPanel.Dock="Bottom" />
-            <ListBox ItemsSource="{Binding Vehicles}" SelectedItem="{Binding SelectedVehicle}" Margin="0,4,0,0">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Vertical" Margin="2">
-                            <TextBlock Text="{Binding Nickname}" FontWeight="SemiBold" />
-                            <TextBlock>
-                                <Run Text="{Binding Make, Mode=OneWay}" />
-                                <Run Text="{Binding Model, Mode=OneWay}" />
-                                <Run Text="(" /><Run Text="{Binding Year, Mode=OneWay}" /><Run Text=")" />
-                            </TextBlock>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </DockPanel>
+        <Border Grid.Column="0" Style="{StaticResource PanelCardStyle}">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="Vehicles" Style="{StaticResource SectionHeaderTextStyle}" />
+                <views:VehicleEditView DockPanel.Dock="Bottom" />
+                <ListBox DockPanel.Dock="Top"
+                         Style="{StaticResource CardRowListBoxStyle}"
+                         ItemContainerStyle="{StaticResource CardRowListBoxItemStyle}"
+                         ItemTemplate="{StaticResource VehicleCardTemplate}"
+                         ItemsSource="{Binding Vehicles}"
+                         SelectedItem="{Binding SelectedVehicle}"
+                         Margin="0,8,0,0" />
+            </DockPanel>
+        </Border>
 
         <!-- Service log for the selected vehicle -->
-        <DockPanel x:Name="ServiceLogPanel" Grid.Column="2">
-            <TextBlock DockPanel.Dock="Top" Text="Service Log" FontWeight="Bold" FontSize="14" />
-            <views:ServiceEntryEditView DockPanel.Dock="Bottom" />
-            <ListBox ItemsSource="{Binding ServiceEntries}" SelectedItem="{Binding SelectedEntry}" Margin="0,4,0,0">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Vertical" Margin="2">
-                            <TextBlock>
-                                <Run Text="{Binding Date, Mode=OneWay, StringFormat=d}" />
-                                <Run Text="-" />
-                                <Run Text="{Binding ServiceType, Mode=OneWay}" />
-                            </TextBlock>
-                            <TextBlock>
-                                <Run Text="{Binding Cost, Mode=OneWay, StringFormat=C}" />
-                                <Run Text="@" />
-                                <Run Text="{Binding Odometer, Mode=OneWay}" />
-                                <Run Text="mi" />
-                            </TextBlock>
+        <Border x:Name="ServiceLogPanel" Grid.Column="2" Style="{StaticResource PanelCardStyle}">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="Service Log" Style="{StaticResource SectionHeaderTextStyle}" />
+
+                <!-- Summary: Total spent / Entry count / Last service date -->
+                <UniformGrid DockPanel.Dock="Top" Columns="3" Margin="0,12,0,0">
+                    <Border Style="{StaticResource MetricCardStyle}" Margin="0,0,4,0">
+                        <StackPanel>
+                            <TextBlock Text="Total Spent" Style="{StaticResource MetricLabelTextStyle}" />
+                            <TextBlock Text="{Binding TotalCost, StringFormat=C}" Style="{StaticResource MetricNumberTextStyle}" />
                         </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </DockPanel>
+                    </Border>
+                    <Border Style="{StaticResource MetricCardStyle}" Margin="4,0">
+                        <StackPanel>
+                            <TextBlock Text="Entries" Style="{StaticResource MetricLabelTextStyle}" />
+                            <TextBlock Text="{Binding EntryCount}" Style="{StaticResource MetricNumberTextStyle}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource MetricCardStyle}" Margin="4,0,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Last Service" Style="{StaticResource MetricLabelTextStyle}" />
+                            <TextBlock Text="{Binding LastServiceDate, StringFormat=d, TargetNullValue='—'}" Style="{StaticResource MetricNumberTextStyle}" />
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+
+                <views:ServiceEntryEditView DockPanel.Dock="Bottom" />
+
+                <ListBox DockPanel.Dock="Top"
+                         Style="{StaticResource CardRowListBoxStyle}"
+                         ItemContainerStyle="{StaticResource CardRowListBoxItemStyle}"
+                         ItemTemplate="{StaticResource ServiceEntryCardTemplate}"
+                         ItemsSource="{Binding ServiceEntries}"
+                         SelectedItem="{Binding SelectedEntry}"
+                         Margin="0,12,0,0" />
+            </DockPanel>
+        </Border>
     </Grid>
 </Window>

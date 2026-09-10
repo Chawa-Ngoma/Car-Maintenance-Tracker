@@ -10,8 +10,8 @@
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <converters:NotNullToBooleanConverter x:Key="NotNullToBooleanConverter" />
     </UserControl.Resources>
-    <StackPanel Margin="0,8,0,0">
-        <TextBlock Text="Edit Vehicle" FontWeight="Bold" Margin="0,0,0,4" />
+    <StackPanel Margin="0,12,0,0">
+        <TextBlock Text="Edit Vehicle" Style="{StaticResource CardTitleTextStyle}" Margin="0,0,0,8" />
 
         <Grid IsEnabled="{Binding SelectedVehicle, Converter={StaticResource NotNullToBooleanConverter}}">
             <Grid.ColumnDefinitions>
@@ -26,32 +26,35 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Nickname" VerticalAlignment="Center" />
-            <TextBox Grid.Row="0" Grid.Column="1" Margin="0,2"
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Nickname" Style="{StaticResource FieldLabelTextStyle}" />
+            <TextBox Grid.Row="0" Grid.Column="1" Margin="0,3"
                      Text="{Binding SelectedVehicle.Nickname, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="Make" VerticalAlignment="Center" />
-            <TextBox Grid.Row="1" Grid.Column="1" Margin="0,2"
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Make" Style="{StaticResource FieldLabelTextStyle}" />
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="0,3"
                      Text="{Binding SelectedVehicle.Make, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="Model" VerticalAlignment="Center" />
-            <TextBox Grid.Row="2" Grid.Column="1" Margin="0,2"
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Model" Style="{StaticResource FieldLabelTextStyle}" />
+            <TextBox Grid.Row="2" Grid.Column="1" Margin="0,3"
                      Text="{Binding SelectedVehicle.Model, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
 
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="Year" VerticalAlignment="Center" />
-            <TextBox Grid.Row="3" Grid.Column="1" Margin="0,2"
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Year" Style="{StaticResource FieldLabelTextStyle}" />
+            <TextBox Grid.Row="3" Grid.Column="1" Margin="0,3"
                      Text="{Binding SelectedVehicle.Year, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
 
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="Plate" VerticalAlignment="Center" />
-            <TextBox Grid.Row="4" Grid.Column="1" Margin="0,2"
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Plate" Style="{StaticResource FieldLabelTextStyle}" />
+            <TextBox Grid.Row="4" Grid.Column="1" Margin="0,3"
                      Text="{Binding SelectedVehicle.Plate, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
         </Grid>
 
-        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-            <Button Content="Add New" Command="{Binding AddVehicleCommand}" Margin="0,0,4,0" Padding="6,2" />
-            <Button Content="Save" Command="{Binding SaveVehicleCommand}" Margin="0,0,4,0" Padding="6,2"
+        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+            <Button Content="Add New" Command="{Binding AddVehicleCommand}" Margin="0,0,8,0"
+                    Style="{StaticResource PrimaryButtonStyle}" />
+            <Button Content="Save" Command="{Binding SaveVehicleCommand}" Margin="0,0,8,0"
+                    Style="{StaticResource PrimaryButtonStyle}"
                     IsEnabled="{Binding SelectedVehicle.HasErrors, Converter={StaticResource InverseBooleanConverter}, FallbackValue=False}" />
-            <Button Content="Delete" Click="DeleteButton_Click" Padding="6,2"
+            <Button Content="Delete" Click="DeleteButton_Click"
+                    Style="{StaticResource DeleteButtonStyle}"
                     IsEnabled="{Binding SelectedVehicle, Converter={StaticResource NotNullToBooleanConverter}}" />
         </StackPanel>
     </StackPanel>
