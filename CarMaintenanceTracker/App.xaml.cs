@@ -31,11 +31,12 @@ public partial class App : Application
         IServiceLogRepository repository = new ServiceLogRepository(options);
         var mainViewModel = new MainViewModel(repository);
         var serviceLogViewModel = new ServiceLogViewModel(repository);
+        var chartViewModel = new ChartViewModel(serviceLogViewModel);
 
         mainViewModel.SelectedVehicleChanged += async (_, vehicle) =>
             await serviceLogViewModel.SetSelectedVehicleAsync(vehicle);
 
-        var mainWindow = new MainWindow(mainViewModel, serviceLogViewModel);
+        var mainWindow = new MainWindow(mainViewModel, serviceLogViewModel, chartViewModel);
         mainWindow.Show();
 
         _ = mainViewModel.LoadVehiclesAsync();

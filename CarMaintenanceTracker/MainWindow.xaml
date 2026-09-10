@@ -136,6 +136,14 @@
                     </Border>
                 </UniformGrid>
 
+                <!-- Cost trend for the selected vehicle -->
+                <Border x:Name="ChartPanel" DockPanel.Dock="Top" Style="{StaticResource MetricCardStyle}" Margin="0,12,0,0" Height="200">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Text="Cost Trend" Style="{StaticResource CardTitleTextStyle}" Margin="0,0,0,4" />
+                        <views:ChartView />
+                    </DockPanel>
+                </Border>
+
                 <views:ServiceEntryEditView DockPanel.Dock="Bottom" />
 
                 <ListBox DockPanel.Dock="Top"

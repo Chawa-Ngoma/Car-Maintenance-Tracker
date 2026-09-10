@@ -9,11 +9,12 @@ namespace CarMaintenanceTracker;
 /// </summary>
 public partial class MainWindow : Window
 {
-    public MainWindow(MainViewModel mainViewModel, ServiceLogViewModel serviceLogViewModel)
+    public MainWindow(MainViewModel mainViewModel, ServiceLogViewModel serviceLogViewModel, ChartViewModel chartViewModel)
     {
         InitializeComponent();
         DataContext = mainViewModel;
         ServiceLogPanel.DataContext = serviceLogViewModel;
+        ChartPanel.DataContext = chartViewModel;
     }
 
     /// <summary>
